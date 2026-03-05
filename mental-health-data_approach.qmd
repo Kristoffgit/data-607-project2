@@ -1,0 +1,18 @@
+---
+title: "Mental Health Data"
+author: "Kristoff Oliphant"
+format: html
+editor: visual
+---
+
+## Introduction
+
+My goal in this dataset is tidy a wide mental health dataset to see if there's a correlation between anxiety and depression with the amount of sleep an individual gets. The raw data was provided by my classmate in Discussion 5A, where they originally raised the question. The dataset has up to 180 participants that live in various states, therapy, notes, and their sleeping scores. We also have results from each participants PHQ-9 and GAD-7, which tracks their depression and anxiety. The dataset is wide and untidy due to the various columns and the missing values that's scattered all over. It will be important to tidy this data and transform it into long form for analysis.
+
+## Planned Workflow
+
+I plan to load the data and use pivot longer to break down colums like January, February, etc into 'Month' and provide a column for monthly score for each patient. Normalizing variables like city state using separate, and I also want to extract text strings to create numeric columns for the PHQ-9 and GAD-7 scores, and accounting for the inconsistent/missing values in the dataset. After tidying, I will use ggplot to visualize the relationship between sleep hours and mental health scores using a regression line to assess the correlation.
+
+## Anticipated Challenges
+
+A challenge is the string manipulation for columns like screening scorres and sleep. Both have formatting that will need to be translated and tidied for them to be effectively used for calculations. Additionally, making sure that any blank entries are accounted for and do not bother the calculations as well.
