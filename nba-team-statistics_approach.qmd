@@ -1,0 +1,18 @@
+---
+title: "Project 2 - NBA Team Statistics"
+author: "Kristoff Oliphant"
+format: html
+editor: visual
+---
+
+## Introduction
+
+My goal is to transform a wide format dataset that contains NBA team statistics with multiple headers and condensing them to a tidy format that allows for my analysis. The raw data from one of my classmates in Discussion 5A Untidy Data includes statistics from multiple seasons with categories such as Shooting, Advanced, Per Game. These performances are stored as separate columns rather than as values within a single variable column.
+
+## Planned Workflow
+
+My workflow will aim to be reproducible and I'll be using tidyverse. I plan to load the raw nba wide from a csv file into R with the intention of tidying and transforming the data utilzing dplyr for removing redundant columns and using rename to organize columns into a consistent format. I also want to make sure that the statistical metrics are converted from strings to numerical values to conduct mathematical operations. I want to follow what my classmate said and utilize this dataset to view the trends in team performance over time like how three-point shooting has evolved NBA offenses.
+
+## Anticipated Challenges
+
+One of the challenges I can face is re-structuring the data in a way that's readable and able to be worked with. The raw csv contains categories such as 'Per Game', 'Shooting', and 'Advanced' that I will have to make their statistics in these categories can match. There will also be some categories that have empty values due to certain statistics not being counted or missing.
