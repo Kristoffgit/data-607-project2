@@ -1,0 +1,18 @@
+---
+title: "NFL Stats"
+author: "Kristoff Oliphant"
+format: html
+editor: visual
+---
+
+## Introduction
+
+My goal for this analysis is to tidy and transform the wide dataset that contains some basic statistics for NFL players and decipher how their physical attributes such as their height and weight, correlate to the length of their careers. The raw data provided by my classmates post from Discussion 5A, incudes a variety of data such as a players birthplace, college, name, and experience. This data is untidy with alot of missing values and inconsistent formatting, so it'll be important to have the height and weight in a long format for analysis.
+
+## Planned Workflow
+
+I'll use tidyverse to load the csv containing their statistics, rename column headers into a consistent format, and also changing text strings seasons into a numerical value. I'll also do some data separations to split columns for birthplace and career length calculations by splitting years played into start and end. After I finish tidying, I'll use ggplot to determine if height and weight serve as significant predictors of career length.
+
+## Anticipated Challenges
+
+A challenge with this dataset is the inconsistency of the columns. There's many players that do not have all their information provided so they're left blank. There's also many player positions that are left blank which can also possibly play a part in career longevity but we'll have to use the height and weight as discussed above to assess if that matters in career length.
