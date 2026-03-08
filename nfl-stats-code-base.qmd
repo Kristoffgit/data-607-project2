@@ -1,0 +1,64 @@
+---
+title: "NFL Stats"
+author: "Kristoff Oliphant"
+format: html
+editor: visual
+---
+
+## Introduction
+
+My goal for this analysis is to tidy and transform the wide dataset that contains some basic statistics for NFL players and decipher how their physical attributes such as their height and weight, correlate to the length of their careers. The raw data provided by my classmates post from Discussion 5A, incudes a variety of data such as a players birthplace, college, name, and experience. This data is untidy with alot of missing values and inconsistent formatting, so it'll be important to have the height and weight in a long format for analysis.
+
+## Planned Workflow
+
+I'll use tidyverse to load the csv containing their statistics, rename column headers into a consistent format, and also changing text strings seasons into a numerical value. I'll also do some data separations to split columns for birthplace and career length calculations by splitting years played into start and end. After I finish tidying, I'll use ggplot to determine if height and weight serve as significant predictors of career length.
+
+## Anticipated Challenges
+
+A challenge with this dataset is the inconsistency of the columns. There's many players that do not have all their information provided so they're left blank. There's also many player positions that are left blank which can also possibly play a part in career longevity but we'll have to use the height and weight as discussed above to assess if that matters in career length.
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+nfl_raw <- read_csv("Basic_Stats.csv")
+```
+
+```{r}
+nfl_tidy <- nfl_raw %>%
+  rename(
+  birth_place = 'Birth Place',
+  height_inches = 'Height (inches)',
+  weight_lbs = 'Weight (lbs)',
+  years_played = 'Years Played',
+  experience_text = Experience
+) %>%
+  separate(birth_place, into = c("birth_city", "birth_state"), sep = " , ") %>%
+  separate(years_played, into = c("start_year", "end_year"), sep = " - ", convert = TRUE) %>%
+  mutate(career_length = end_year - start_year + 1) %>%
+  filter(!is.na(height_inches), !is.na(weight_lbs)) %>%
+  pivot_longer(
+    cols = c(height_inches, weight_lbs),
+    names_to = "physical_trait",
+    values_to = "trait_value"
+  )
+```
+
+```{r}
+ggplot(nfl_tidy, aes(x = trait_value, y = career_length, color = physical_trait)) +
+geom_jitter(alpha = 0.3) +
+  geom_smooth(method = "lm", color =  "black") +
+  facet_wrap(~physical_trait, scales = "free_x") +
+  labs(
+    title = "NFL Career Length vs. Physical Attributes",
+    x = "Measured Value (Inches or Lbs)",
+    y = "Career Length (Years)",
+    color = "Trait Type"
+  ) +
+  theme_minimal()
+```
+
+**Conclusion**
+
+Based on the trend in the graph, it appears that there's a positive correlation for a players physical attributes when it involves their height and weight, and the length of their career. It shows that as a players height and weight increases, the length of their career also increases as well based on the information available for players in this dataset. You may also notice that there's also players in this cloud that are below the the trend which can showcase that even having upper-level height and weight wont guarantee a long career in the NFL.

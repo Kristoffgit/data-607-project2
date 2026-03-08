@@ -1,0 +1,60 @@
+---
+title: "Project 2 - NBA Team Statistics"
+author: "Kristoff Oliphant"
+format: html
+editor: visual
+---
+
+## Introduction
+
+My goal is to transform a wide format dataset that contains NBA team statistics with multiple headers and condensing them to a tidy format that allows for my analysis. The raw data from one of my classmates in Discussion 5A Untidy Data includes statistics from multiple seasons with categories such as Shooting, Advanced, Per Game. These performances are stored as separate columns rather than as values within a single variable column.
+
+## Planned Workflow
+
+My workflow will aim to be reproducible and I'll be using tidyverse. I plan to load the raw nba wide from a csv file into R with the intention of tidying and transforming the data utilzing dplyr for removing redundant columns and using rename to organize columns into a consistent format. I also want to make sure that the statistical metrics are converted from strings to numerical values to conduct mathematical operations. I want to follow what my classmate said and utilize this dataset to view the trends in team performance over time like how three-point shooting has evolved NBA offenses.
+
+## Anticipated Challenges
+
+One of the challenges I can face is re-structuring the data in a way that's readable and able to be worked with. The raw csv contains categories such as 'Per Game', 'Shooting', and 'Advanced' that I will have to make their statistics in these categories can match. There will also be some categories that have empty values due to certain statistics not being counted or missing.
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+nba_raw <- read_csv("nba_raw_wide.csv", skip = 1)
+```
+
+```{r}
+head(nba_raw)
+```
+
+```{r}
+nba_tidy <- nba_raw %>%
+  mutate(`3P` = replace_na(`3P`, 0)) %>%
+  mutate(`2P` = FG - `3P`) %>%
+  mutate(year = as.numeric(str_extract(Season, "\\d{4}"))) %>%
+  select(year, `2P`, `3P`) %>%
+  pivot_longer(
+    cols = c(`2P`, `3P`),
+    names_to = "Shot_Type",
+    values_to = "Made_Per_Game"
+  )
+```
+
+```{r}
+ggplot(nba_tidy, aes(x = year, y = Made_Per_Game, color =Shot_Type)) +
+  geom_point(alpha = 0.5) +
+  labs(
+    title = "Revolution of the NBA Shot",
+    subtitle = "Evolution of 2-Pointers vs. 3-Pointers (1946 - Present)",
+    x = "Year",
+    y = "Average Shots Made Per Game",
+    color = "Shot Type"
+  ) +
+  theme_minimal()
+```
+
+**Conclusion**
+
+Based on the graph, we can see that during the beginning years of the NBA, there was no 3-Point being recorded until 1979-1980 season. Even during it's beginning of recording, we didn't see much 3-pointers being taken per game but rather, the 2 point had a surge between 1960-1980. It wasn't until the 2000s that we saw the 3-point shot begin to rise while the 2-point shot gradually fell in this time period. We see that NBA teams and game plans began to move further away from the 2-point and the 3-point gained prominence during the 2010s, and reaching an all time high in the 2020s.

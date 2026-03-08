@@ -1,0 +1,92 @@
+---
+title: "Mental Health Data"
+author: "Kristoff Oliphant"
+format: html
+editor: visual
+---
+
+## Introduction
+
+My goal in this dataset is tidy a wide mental health dataset to see if there's a correlation between anxiety and depression with the amount of sleep an individual gets. The raw data was provided by my classmate in Discussion 5A, where they originally raised the question. The dataset has up to 180 participants that live in various states, therapy, notes, and their sleeping scores. We also have results from each participants PHQ-9 and GAD-7, which tracks their depression and anxiety. The dataset is wide and untidy due to the various columns and the missing values that's scattered all over. It will be important to tidy this data and transform it into long form for analysis.
+
+## Planned Workflow
+
+I plan to load the data and use pivot longer to break down colums like January, February, etc into 'Month' and provide a column for monthly score for each patient. Normalizing variables like city state using separate, and I also want to extract text strings to create numeric columns for the PHQ-9 and GAD-7 scores, and accounting for the inconsistent/missing values in the dataset. After tidying, I will use ggplot to visualize the relationship between sleep hours and mental health scores using a regression line to assess the correlation.
+
+## Anticipated Challenges
+
+A challenge is the string manipulation for columns like screening scorres and sleep. Both have formatting that will need to be translated and tidied for them to be effectively used for calculations. Additionally, making sure that any blank entries are accounted for and do not bother the calculations as well.
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+mh_raw <- read_csv("untidy_mental_health_data.csv")
+```
+
+```{r}
+mh_cleaned <- mh_raw %>%
+  separate(City_State, into = c("City", "State"), sep = ", ") %>%
+  mutate(Gender = case_when(
+    Gender %in% c("F", "Female") ~ "Female",
+    Gender %in% c("M", "Male") ~ "Male",
+    TRUE ~ "Other/Unknown"
+  )) %>%
+  mutate(sleep_hours = as.numeric(str_extract(Sleep, "\\d+\\.?\\d*")))
+```
+
+```{r}
+head(mh_cleaned)
+```
+
+```{r}
+mh_tidy <- mh_cleaned %>%
+  mutate(
+    phq9_raw = str_extract(ScreeningScores, "PHQ-?9[:=]\\d+"),
+    phq9_score = as.numeric(str_remove(phq9_raw, "PHQ-?9[:=]")),
+    gad7_raw = str_extract(ScreeningScores, "GAD-?7[:=]\\d+"),
+    gad7_score = as.numeric(str_remove(gad7_raw, "GAD-?7[:=]"))
+  ) %>%
+  pivot_longer(
+    cols = c(Jan, Feb, Mar, Apr, May),
+    names_to = "Month",
+    values_to = "Monthly_Score_Raw"
+  ) %>%
+  filter(!is.na(Monthly_Score_Raw),
+         !Monthly_Score_Raw %in% c("-", "missing", "n/a")) %>%
+  mutate(Monthly_Score = as.numeric(Monthly_Score_Raw))
+```
+
+```{r}
+glimpse(mh_tidy)
+```
+
+```{r}
+ggplot(mh_tidy, aes(x = sleep_hours, y = phq9_score)) +
+  geom_jitter(alpha = 0.5, color = "darkorchid") +
+  geom_smooth(method = "lm", color = "black") +
+  labs(
+    title = "The Relationship Between Sleep for Anxiety and Depression",
+    subtitle = "Analysis of Reported Sleep Hours vs. PHQ-9 Screening Scores",
+    x = "Average Sleep Hours",
+    y = "Depression Score (PHQ-9)"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+ggplot(mh_tidy, aes( x = sleep_hours, y = gad7_score)) +
+  geom_jitter(alpha = 0.5, color = "blue") +
+  geom_smooth(method = "lm", color = "black") +
+  labs(
+    title = "The Relationship Between Sleep and Anxiety",
+    subtitle = "Analysis of Reported Sleep Hours vs. GAD-7 Screening Scores",
+    x = "Average Sleep Hours",
+    y = "Anxiety Score (GAD-7)"
+  ) +
+  theme_minimal()
+```
+**Conclusion**
+
+After reviewing and tidying this dataset, it apears that the relationship for sleep between anxiety and depression doesn't strongly correlate. Both graphs have a fairly straight trend line that sits between 10-13 on the screening scales for both anxiety and depression. Additionally, for example in the Anxiety graph, some people in this dataset get over 8 hours of sleep and score as high as 20, while others with similar sleep are low on the scale at about a score of 5. The same story is true for depression graph as well.
